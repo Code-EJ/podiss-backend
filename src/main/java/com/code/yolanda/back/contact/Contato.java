@@ -1,5 +1,4 @@
-// src/main/java/com/code/yolanda/back/user/User.java
-package com.code.yolanda.back.user;
+package com.code.yolanda.back.contact;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,21 +8,24 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "contatos")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Contato {
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(unique = true, nullable = false)
-    private String username;
+    @Column(nullable = false)
+    private String nome;
 
     @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
+    private String assunto;
+
+    @Column(nullable = false)
+    private String mensagem;
 }

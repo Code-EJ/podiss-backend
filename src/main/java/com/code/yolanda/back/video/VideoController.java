@@ -1,28 +1,27 @@
-// src/main/java/com/code/yolanda/back/video/VideoController.java
 package com.code.yolanda.back.video;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/episodes")
-@CrossOrigin(origins = "http://localhost:5173")
 public class VideoController {
+
     @Autowired
     private VideoService service;
 
-    @GetMapping
+    @GetMapping("")
     public ResponseEntity<List<Video>> getAllEpisodes() {
         List<Video> episodes = service.getAllEpisodes();
         return ResponseEntity.ok(episodes);
     }
 
-    @GetMapping("/video/{youtubeId}")
+    @GetMapping("/{youtubeId}")
     public ResponseEntity<Video> getEpisodeByYouTubeId(@PathVariable String youtubeId) {
         Video episode = service.getEpisodeByYouTubeId(youtubeId);
         return episode != null ? ResponseEntity.ok(episode) : ResponseEntity.notFound().build();
@@ -46,3 +45,4 @@ public class VideoController {
         return isDeleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 }
+
