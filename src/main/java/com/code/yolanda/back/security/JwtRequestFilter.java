@@ -1,4 +1,3 @@
-// JwtRequestFilter.java
 package com.code.yolanda.back.security;
 
 import jakarta.servlet.FilterChain;
@@ -45,36 +44,54 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String username = null;
         String jwtToken = null;
 
-        // Confirmando se o token contem no cabeçalho o "Bearer" antes de começar o codigo
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
-            try {
-                username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-            } catch (Exception e) {
-                // Token inválido
-                logger.error("Token JWT inválido", e);
-            }
-        } else {
-            logger.warn("JWT Token não encontrado ou não começa com 'Bearer '");
+        // Confirmando se o token contem no cabeçalho o "Bearer" antes de começar o
+        // codigo
+
+        logger.debug(requestTokenHeader);
+
+        if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer ")) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "Acesso negado. Você deve estar autenticado para acessar a URL solicitada.");
+            return;
+        }
+
+        jwtToken = requestTokenHeader.substring(7);
+        username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+
+        if (username == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "Usuário não encontrado no token.");
+                    return;
         }
 
         // apenas validando o token
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = this.userService.loadUserByUsername(username);
+        UserDetails userDetails = null;
 
-            // Se o token for válido boto autenticado no usuario
-            if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        usernamePasswordAuthenticationToken
-                        .setDetails(new org.springframework.security.web.authentication.WebAuthenticationDetailsSource()
-                                .buildDetails(request));
-                // Depois de definir a autenticação no contexto, especificamos
-                // que o usuário está autenticado e passa pelas configurações de segurança
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
+        try {
+            userDetails = this.userService.loadUserByUsername(username);
+        } catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "Usuário não encontrado.");
+                    return;
         }
+
+        if (!jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "Token inválido.");
+                    return;
+        }
+
+        // Se o token for válido boto autenticado no usuario
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
+        usernamePasswordAuthenticationToken
+                .setDetails(new org.springframework.security.web.authentication.WebAuthenticationDetailsSource()
+                        .buildDetails(request));
+        // Depois de definir a autenticação no contexto, especificamos
+        // que o usuário está autenticado e passa pelas configurações de segurança
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+    
         chain.doFilter(request, response);
     }
 
@@ -91,11 +108,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             return true;
         }
 
-        // Rotas públicas: GET /posts/** e GET /episodes/** coloquei tambem como outras opçoes o h2-console para teste e os videos.
+        // Rotas públicas: GET /posts/** e GET /episodes/** coloquei tambem como outras
+        // opçoes o h2-console para teste e os videos.
         if (HttpMethod.GET.matches(method)) {
-            if (pathMatcher.match("/posts/**", uri) || pathMatcher.match("/episodes/**", uri) || (pathMatcher.match("/video/**", uri) || (pathMatcher.match("/h2-console/**", uri)))){
-                return true;
-            }
+            return pathMatcher.match("/posts/**", uri) ||
+                    pathMatcher.match("/episodes/**", uri) ||
+                    pathMatcher.match("/video/**", uri) ||
+                    pathMatcher.match("/h2-console/**", uri) ||
+                    pathMatcher.match("/admin/login/**", uri);
+
         }
 
         return false;

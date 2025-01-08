@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS posts (
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     tags TEXT,
+    image LONGBLOB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -20,4 +21,3 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE
 );
-

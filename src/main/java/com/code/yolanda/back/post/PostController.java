@@ -1,15 +1,20 @@
 // src/main/java/com/code/yolanda/back/post/PostController.java
 package com.code.yolanda.back.post;
 
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/posts")
@@ -17,10 +22,12 @@ public class PostController {
     @Autowired
     private PostService postService;
 
-    @PostMapping
+    @PostMapping()
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Post> createPost(@RequestBody PostRequest request) {
-        Post post = postService.createPost(request.getTitle(), request.getDescription(), request.getTags());
+    public ResponseEntity<Post> createPost(@ModelAttribute PostRequest request) throws IOException {
+        Post post;
+        post = postService.createPost(request.getTitle(), request.getDescription(), request.getTags(), request.getImage().getBytes());
+
         return ResponseEntity.ok(post);
     }
 
@@ -37,8 +44,19 @@ public class PostController {
 
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Post> updatePost(@PathVariable String id, @RequestBody PostRequest request) {
-        Post updatedPost = postService.updatePost(id, request.getTitle(), request.getDescription(), request.getTags());
+    public ResponseEntity<Post> updatePost(@PathVariable String id, @RequestBody PostRequest request) throws IOException {
+        byte[] imageBytes = null;
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            imageBytes = request.getImage().getBytes();
+        }
+        Post updatedPost = postService.updatePost(
+                id,
+                request.getTitle(),
+                request.getDescription(),
+                request.getTags(),
+                imageBytes
+        );
+
         if (updatedPost != null) {
             return ResponseEntity.ok(updatedPost);
         } else {
@@ -47,17 +65,25 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    //@PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deletePost(@PathVariable UUID id) {
         postService.deletePost(id);
         return ResponseEntity.noContent().build();
     }
 
-}
+    @GetMapping("/image/{id}")
+    public ResponseEntity<byte[]> getImage(@PathVariable UUID id) {
+        Optional<Post> optionalPost = postService.findPostById(id);
+        if (optionalPost.isPresent() && optionalPost.get().getImage() != null) {
+            byte[] contents = optionalPost.get().getImage();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_JPEG); // Ajuste conforme o tipo real da imagem.
+            headers.setContentLength(contents.length);
+            return new ResponseEntity<>(contents, headers, HttpStatus.OK);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-@Data
-class PostRequest {
-    private String title;
-    private String description;
-    private List<String> tags;
+
 }

@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +15,6 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -48,8 +46,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
-            // Autetica o usuário
-            Authentication authentication = authenticationManager.authenticate(
+            //Autetica o usuário
+            authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(), loginRequest.getPassword())
             );
@@ -63,6 +61,7 @@ public class AuthController {
 
             return ResponseEntity.ok(new JwtResponse(token));
         } catch (BadCredentialsException e) {
+            //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha inválidos.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha inválidos.");
         }
     }

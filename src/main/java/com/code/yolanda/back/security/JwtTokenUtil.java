@@ -5,8 +5,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.security.core.userdetails.UserDetails;
+//import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -19,7 +20,9 @@ public class JwtTokenUtil {
     private final Key secretKey;
 
     // Injeção da chave secreta do arquivo de propriedades
-    public JwtTokenUtil(@Value("${jwt.secret}") String base64Secret) {
+    public JwtTokenUtil() {
+        String base64Secret = "n9o4oZ0tE6gfpV09FmdgfbU9Jwsccew2osMzdPLrMHEYq9llYd+tefrzZ3dn/mOhUXqPkzITvFfnbhwV7S/kDg==";
+
         if (base64Secret == null || base64Secret.isEmpty()) {
             throw new IllegalArgumentException("A chave secreta JWT não está definida no application.properties!");
         }

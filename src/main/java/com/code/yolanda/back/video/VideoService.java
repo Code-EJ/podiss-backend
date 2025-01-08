@@ -29,7 +29,7 @@ public class VideoService {
     public Video createEpisode(String videoUrl) {
         Video video = new Video();
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("python3", "src//main//java//com//code//yolanda//back//scrap//youtube-scrapp.py", videoUrl);
+            ProcessBuilder processBuilder = new ProcessBuilder("python3", "youtube-scrapp.py", videoUrl);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
 
@@ -43,6 +43,8 @@ public class VideoService {
             process.waitFor();
 
             ObjectMapper objectMapper = new ObjectMapper();
+            
+            @SuppressWarnings("unchecked")
             Map<String, String> videoData = objectMapper.readValue(jsonOutput.toString(), Map.class);
 
             video.setTitle(videoData.get("title"));
