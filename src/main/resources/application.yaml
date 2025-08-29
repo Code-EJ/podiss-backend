@@ -1,27 +1,22 @@
-spring:
+server:
+  port: 443
   ssl:
-    bundle:
-      jks:
-        server:
-          key:
-            alias: "server"
-          keystore:
-            location: "classpath:server.p12"
-            password: "secret"
-            type: "PKCS12"
-      pem:
-        client:
-          truststore:
-            certificate: "classpath:client.crt"
+    enabled: true
+    key-store: classpath:server.p12
+    key-store-password: senhaComplexa26041970
+    key-store-type: PKCS12
+    key-alias: server
+
+spring:
   datasource:
-    driver-class-name: "org.mariadb.jdbc.Driver"
-    url: "jdbc:mariadb://srv1197.hstgr.io:3306/u417179784_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
-    username: "u417179784_user"
-    password: "1uQ=X0gu"
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://srv1197.hstgr.io:3306/u417179784_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: u417179784_user
+    password: 1uQ=X0gu
     hikari:
       max-lifetime: 18000
   jpa:
     hibernate:
-      ddl-auto: "update"
+      ddl-auto: update
     show-sql: true
     open-in-view: false
