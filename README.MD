@@ -1,4 +1,4 @@
-# PodISS Backend
+# PodIss Backend
 
 Backend service for the PodISS podcast platform.
 
