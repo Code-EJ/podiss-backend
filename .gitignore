@@ -37,3 +37,4 @@ build/
 .env
 .env.*
 !.env.example
+.run/BackApplication.run.xml
