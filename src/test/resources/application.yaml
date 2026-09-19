@@ -1,0 +1,30 @@
+# Configuration for Spring Boot Tests
+spring:
+  datasource:
+    url: jdbc:h2:mem:podiss-test;MODE=MariaDB;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  flyway:
+    enabled: false
+
+app:
+  jwt:
+    secret: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
+    issuer: podiss-backend-test
+    ttl: PT5H
+  bootstrap:
+    username: admin_test
+    email: admin@test.com
+    password: test_password
+  youtube:
+    api-key: mock-api-key
+    connect-timeout: PT3S
+    read-timeout: PT8S
+  submissions:
+    limit: 10
+    window: PT1M
