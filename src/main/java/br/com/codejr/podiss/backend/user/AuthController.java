@@ -1,72 +1,27 @@
+// Créditos: oEnzoRibas
 package br.com.codejr.podiss.backend.user;
-
-import br.com.codejr.podiss.backend.security.JwtTokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import br.com.codejr.podiss.backend.security.JwtTokenService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.regex.Pattern;
-
-@RestController
-@RequestMapping("/api/auth")
+@RestController @RequestMapping("/api/auth") @RequiredArgsConstructor
 public class AuthController {
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
-    private UserService userService;
-
-    // Regex para validar o formato do email
-    private static final String EMAIL_REGEX = "^[\\w-\\.]+@[\\w-]+\\.[a-zA-Z]{2,}$";
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
-
-    @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-
-        if (userService.findByUsername(user.getUsername()) != null) {
-            return ResponseEntity.badRequest().body("Nome de usuário já está em uso.");
-        }
-
-        if (!isValidEmail(user.getEmail())) {
-            return ResponseEntity.badRequest().body("Formato de email inválido.");
-        }
-
-        userService.save(user);
-        return ResponseEntity.ok("Usuário registrado com sucesso!");
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenService tokens;
+    private final UserService users;
+    @PostMapping("/register") @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
+        users.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Usuário registrado com sucesso!");
     }
-
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        try {
-            //Autetica o usuário
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getUsername(), loginRequest.getPassword())
-            );
-
-            // Carrega os detalhes do usuário
-            final UserDetails userDetails = userService
-                    .loadUserByUsername(loginRequest.getUsername());
-
-            // Gera o token JWT
-            final String token = jwtTokenUtil.generateToken(userDetails);
-
-            return ResponseEntity.ok(new JwtResponse(token));
-        } catch (BadCredentialsException e) {
-            //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha inválidos.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha inválidos.");
-        }
-    }
-
-    private boolean isValidEmail(String email) {
-        return EMAIL_PATTERN.matcher(email).matches();
+    public JwtResponse login(@Valid @RequestBody LoginRequest request) {
+        var authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+        return new JwtResponse(tokens.generateToken((UserDetails) authentication.getPrincipal()));
     }
 }

@@ -1,72 +1,67 @@
+// Créditos: oEnzoRibas
 package br.com.codejr.podiss.backend.post;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.codejr.podiss.backend.common.ApiException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID; // Esta linha deve estar presente
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.List;
-
-@Service
+import java.time.Instant;
+import java.util.*;
+@Service @RequiredArgsConstructor @Transactional
 public class PostService {
-    @Autowired
-    private PostRepository repository;
-
-    public Post createPost(String title, String description, List<String> tags, byte[] image) {
+    private final PostRepository repository;
+    private final ImageValidator images;
+    public PostResponse create(CreatePostRequest request) {
         Post post = new Post();
-        post.setTitle(title);
-        post.setDescription(description);
-        post.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
-        post.setImage(image);
-        
-        //caso tag vazia = ''
-        String tagsString = tags != null && !tags.isEmpty() ? String.join(",", tags) : "";
-        post.setTags(tagsString);
-
-        return repository.save(post);
+        post.setTitle(request.getTitle().trim());
+        post.setDescription(request.getDescription().trim());
+        post.setTags(tags(request.getTags()));
+        post.setCreatedAt(Timestamp.from(Instant.now()));
+        if (request.getImage() != null && !request.getImage().isEmpty()) assignImage(post, request.getImage());
+        return PostResponse.from(repository.saveAndFlush(post));
     }
-    public void deletePost(UUID id) {
-        repository.deleteById(id);
+    @Transactional(readOnly = true)
+    public Page<PostResponse> list(Pageable page) { return repository.findSummaries(page); }
+    @Transactional(readOnly = true)
+    public PostResponse get(UUID id) { return PostResponse.from(required(id)); }
+    public PostResponse update(UUID id, UpdatePostRequest request) {
+        Post post = required(id);
+        if (request.title() != null) post.setTitle(request.title().trim());
+        if (request.description() != null) post.setDescription(request.description().trim());
+        if (request.tags() != null) post.setTags(tags(request.tags()));
+        return PostResponse.from(repository.saveAndFlush(post));
     }
-
-
-    public List<Post> findAllPosts() {
-        return repository.findAll();
+    public PostResponse replaceImage(UUID id, MultipartFile file) {
+        Post post = required(id); assignImage(post, file);
+        return PostResponse.from(repository.saveAndFlush(post));
     }
-    public Optional<Post> findPostById(UUID id) {
-        return repository.findById(id);
+    public void removeImage(UUID id) {
+        Post post = required(id); post.setImage(null); post.setImageContentType(null);
+        repository.save(post);
     }
-
-    public Post updatePost(String id, String title, String description, List<String> tags, byte[] imageBytes) {
-        Optional<Post> optionalPost = repository.findById(UUID.fromString(id));
-        if (optionalPost.isPresent()) {
-            Post post = optionalPost.get();
-
-            // Atualiza o título se não for nulo e não vazio
-            if (title != null && !title.trim().isEmpty()) {
-                post.setTitle(title);
-            }
-
-            // Atualiza a descrição se não for nula e não vazia
-            if (description != null && !description.trim().isEmpty()) {
-                post.setDescription(description);
-            }
-
-            // Atualiza as tags se não for nulo.
-            // Se for lista vazia, significa remover as tags
-            if (tags != null) {
-                String tagsString = tags.isEmpty() ? "" : String.join(",", tags);
-                post.setTags(tagsString);
-            }
-
-            // Atualiza a imagem apenas se imageBytes não for nulo
-            if (imageBytes != null) {
-                post.setImage(imageBytes);
-            }
-
-            return repository.save(post);
-        }
-        return null;
+    @Transactional(readOnly = true)
+    public ImageValidator.Image image(UUID id) {
+        Post post = required(id);
+        if (post.getImage() == null) throw new ApiException(HttpStatus.NOT_FOUND, "Post sem imagem.");
+        return new ImageValidator.Image(post.getImage(), post.getImageContentType());
+    }
+    public void delete(UUID id) { repository.delete(required(id)); }
+    private Post required(UUID id) {
+        return repository.findById(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Post não encontrado."));
+    }
+    private void assignImage(Post post, MultipartFile file) {
+        var image = images.read(file);
+        post.setImage(image.bytes()); post.setImageContentType(image.contentType());
+    }
+    private String tags(List<String> values) {
+        if (values == null) return "";
+        // Accept legacy form values such as '"tag1","tag2"' without saving JSON quotes.
+        return values.stream().map(String::trim).map(s -> s.replaceAll("^\\\"|\\\"$", ""))
+            .peek(s -> { if (s.isBlank() || s.contains(","))
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Tags não podem ser vazias nem conter vírgula."); })
+            .distinct().collect(java.util.stream.Collectors.joining(","));
     }
 }

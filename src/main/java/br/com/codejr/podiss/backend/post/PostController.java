@@ -1,89 +1,47 @@
-// src/main/java/com/code/yolanda/back/post/PostController.java
+// Créditos: oEnzoRibas
 package br.com.codejr.podiss.backend.post;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import br.com.codejr.podiss.backend.common.PaginationSupport;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-
-@RestController
-@RequestMapping("/posts")
+import org.springframework.web.multipart.MultipartFile;
+import java.util.*;
+@RestController @RequestMapping("/posts") @RequiredArgsConstructor
 public class PostController {
-    @Autowired
-    private PostService postService;
-
-    @PostMapping()
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Post> createPost(@ModelAttribute PostRequest request) throws IOException {
-        Post post;
-        post = postService.createPost(request.getTitle(), request.getDescription(), request.getTags(), request.getImage().getBytes());
-
-        return ResponseEntity.ok(post);
+    private final PostService service;
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE) @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PostResponse> create(@Valid @ModelAttribute CreatePostRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
     }
-
     @GetMapping
-    public ResponseEntity<List<Post>> getAllPosts() {
-        List<Post> posts = postService.findAllPosts();
-        return ResponseEntity.ok(posts);
+    public ResponseEntity<List<PostResponse>> list(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size, @RequestParam(defaultValue = "asc") String order) {
+        return PaginationSupport.response(service.list(PaginationSupport.request(page, size, order)));
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Post> getPostById(@PathVariable UUID id) {
-        Optional<Post> optionalPost = postService.findPostById(id);
-        return optionalPost.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public PostResponse get(@PathVariable UUID id) { return service.get(id); }
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE) @PreAuthorize("hasRole('ADMIN')")
+    public PostResponse update(@PathVariable UUID id, @Valid @RequestBody UpdatePostRequest request) {
+        return service.update(id, request);
     }
-
-    @PutMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Post> updatePost(@PathVariable String id, @RequestBody PostRequest request) throws IOException {
-        byte[] imageBytes = null;
-        if (request.getImage() != null && !request.getImage().isEmpty()) {
-            imageBytes = request.getImage().getBytes();
-        }
-        Post updatedPost = postService.updatePost(
-                id,
-                request.getTitle(),
-                request.getDescription(),
-                request.getTags(),
-                imageBytes
-        );
-
-        if (updatedPost != null) {
-            return ResponseEntity.ok(updatedPost);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping("/{id}") @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        service.delete(id); return ResponseEntity.noContent().build();
     }
-
-    @DeleteMapping("/{id}")
-    //@PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Void> deletePost(@PathVariable UUID id) {
-        postService.deletePost(id);
-        return ResponseEntity.noContent().build();
+    @PutMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) @PreAuthorize("hasRole('ADMIN')")
+    public PostResponse replaceImage(@PathVariable UUID id, @RequestPart("image") MultipartFile image) {
+        return service.replaceImage(id, image);
     }
-
+    @DeleteMapping("/{id}/image") @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> removeImage(@PathVariable UUID id) {
+        service.removeImage(id); return ResponseEntity.noContent().build();
+    }
     @GetMapping("/image/{id}")
-    public ResponseEntity<byte[]> getImage(@PathVariable UUID id) {
-        Optional<Post> optionalPost = postService.findPostById(id);
-        if (optionalPost.isPresent() && optionalPost.get().getImage() != null) {
-            byte[] contents = optionalPost.get().getImage();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG); // Ajuste conforme o tipo real da imagem.
-            headers.setContentLength(contents.length);
-            return new ResponseEntity<>(contents, headers, HttpStatus.OK);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<byte[]> image(@PathVariable UUID id) {
+        var image = service.image(id);
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(image.contentType()))
+            .contentLength(image.bytes().length).body(image.bytes());
     }
-
-
 }

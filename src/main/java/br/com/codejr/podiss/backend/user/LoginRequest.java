@@ -1,10 +1,5 @@
-// src/main/java/com/code/yolanda/back/user/LoginRequest.java
+// Créditos: oEnzoRibas
 package br.com.codejr.podiss.backend.user;
-
-import lombok.Data;
-
-@Data
-public class LoginRequest {
-    private String username;
-    private String password;
-}
+import jakarta.validation.constraints.*;
+public record LoginRequest(@NotBlank @Size(max = 100) String username,
+                           @NotBlank @Size(max = 72) String password) {}

@@ -1,39 +1,37 @@
+// Créditos: oEnzoRibas
 package br.com.codejr.podiss.backend.user;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
+import br.com.codejr.podiss.backend.common.ApiException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.core.userdetails.UserDetailsService;
-
-import java.util.ArrayList;
-
-@Service
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+@Service @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    public User save(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+    private final UserRepository repository;
+    private final PasswordEncoder encoder;
+    @Transactional
+    public User register(RegisterRequest request) {
+        String email = request.email().trim().toLowerCase(Locale.ROOT);
+        if (repository.existsByUsername(request.username()) || repository.existsByEmail(email))
+            throw new ApiException(HttpStatus.CONFLICT, "Usuário ou email já cadastrado.");
+        if (request.password().getBytes(StandardCharsets.UTF_8).length > 72)
+            throw new ApiException(HttpStatus.BAD_REQUEST, "A senha deve ter no máximo 72 bytes em UTF-8.");
+        User user = new User();
+        user.setUsername(request.username());
+        user.setEmail(email);
+        user.setPassword(encoder.encode(request.password()));
+        user.setRole(request.role() == null ? User.Role.USER : request.role());
+        return repository.saveAndFlush(user);
     }
-
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("Usuário não encontrado: " + username);
-        }
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(), user.getPassword(), new ArrayList<>());
+    public UserDetails loadUserByUsername(String username) {
+        User user = repository.findByUsername(username);
+        if (user == null) throw new UsernameNotFoundException("Usuário não encontrado.");
+        return org.springframework.security.core.userdetails.User.withUsername(user.getUsername())
+            .password(user.getPassword()).roles(user.getRole().name()).build();
     }
 }
