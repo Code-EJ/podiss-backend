@@ -6,7 +6,7 @@ Java 21, Spring Boot 3.4.1, MariaDB 11.8.9 nos testes/ambiente local e Flyway 10
 
 ## Comece aqui
 
-1. [Tutorial passo a passo: desenvolvimento com Docker](docs/development/local-environment.md).
+1. [Tutorial passo a passo: iniciar no Git Bash/PowerShell, testar a API e conferir o banco](docs/development/local-environment.md).
 2. [Entenda .env, .env.dev e configuração SSH](docs/configuration/environment.md).
 3. [Configure seu acesso local à VPS e faça diagnóstico somente leitura](docs/deployment/vps-access.md).
 4. [Runbook de deploy — pendências explícitas antes de produção](docs/deployment/runbook.md).
@@ -15,11 +15,29 @@ Java 21, Spring Boot 3.4.1, MariaDB 11.8.9 nos testes/ambiente local e Flyway 10
 
 **Docker local:** use .env.dev, não .env. Nesta máquina ele já foi gerado com credenciais exclusivas locais. Em clone novo, copie .env.dev.example e preencha seguindo o tutorial.
 
+### Iniciar pelo PowerShell
+
+Abra o Docker Desktop, espere o engine Linux iniciar e execute na raiz do projeto:
+
 ```powershell
 .\scripts\dev.ps1 Up
 .\scripts\dev.ps1 Status
 .\scripts\dev.ps1 Validate
 ```
+
+### Iniciar pelo Git Bash (MINGW64)
+
+Não execute ./scripts/dev.ps1 diretamente no Bash: .ps1 é PowerShell e causa erro em [CmdletBinding()]. Use:
+
+```bash
+docker compose --env-file .env.dev -f compose.dev.yaml up -d --build --wait --wait-timeout 180
+docker compose --env-file .env.dev -f compose.dev.yaml ps -a
+docker compose --env-file .env.dev -f compose.dev.yaml run --rm migrate validate
+```
+
+Alternativa no Git Bash: powershell.exe -NoProfile -File ./scripts/dev.ps1 Up.
+
+Espere app/db como healthy e migrate como Exited (0). Abra o [Swagger local](http://localhost:18080/swagger-ui/index.html). Para criar um contato pela API e verificar o registro com SELECT no MariaDB, siga a seção **3. Testar a API e conferir o banco** do [tutorial](docs/development/local-environment.md).
 
 Aplicação em http://localhost:18080. Banco não exposto ao host. `Down` para parar preservando volume. Não copie o Compose de desenvolvimento para a VPS.
 
