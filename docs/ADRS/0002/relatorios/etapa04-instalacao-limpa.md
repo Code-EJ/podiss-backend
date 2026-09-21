@@ -2,6 +2,8 @@
 
 Créditos/responsável: **oEnzoRibas**. Data: 20/09/2026.
 
+Nota histórica: depois deste relatório o responsável confirmou uma VPS Ubuntu 24.04 e autorizou continuar até a etapa 10. A CLI foi validada localmente na etapa 06. As afirmações abaixo sobre runtime ainda não identificado e ausência de commits refletem o momento da etapa 04; consulte o relatório final e o runbook para o estado atual. Não houve deploy remoto.
+
 ## 1. Decisão e escopo
 
 Implementação da alternativa **D1** do [relatório revisado da etapa 03](etapa03-estrategia-banco-e-migracoes.md): preparar uma base nova, sem importar dados legados, validar e depois realizar corte coordenado. Não foi feito deploy nem acesso à Hostinger.

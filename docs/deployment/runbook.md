@@ -68,4 +68,30 @@ Restore: apenas com backup validado e aprovação da perda de gravações poster
 
 ## Critério de conclusão
 
-Este runbook só será executável de ponta a ponta após o Gate 0. A autorização para concluir as demais etapas quando houver procedimento definido não elimina essa pendência. Não houve deploy, login SSH ou alteração na Hostinger nesta entrega.
+Este runbook só será executável de ponta a ponta após o Gate 0. A autorização posterior para concluir até a etapa 10 permite trabalho local, mas não elimina essa pendência. Não houve deploy, login SSH ou alteração na Hostinger nesta entrega.
+
+## Backup pelo hPanel/phpMyAdmin
+
+1. Abrir phpMyAdmin a partir do banco correto no hPanel. Confirmar base e tabelas.
+2. Exportar em modo personalizado, formato SQL, todas as tabelas, estrutura e dados. Para InnoDB, preferir exportação consistente com transação quando disponível; coordenar pausa de escritores se necessária.
+3. Preservar charset e dados binários das imagens. Conferir necessidade de rotinas/eventos e privilégios de exportação; não presumir inclusão automática.
+4. Salvar fora do Git com acesso restrito, base/data e checksum. Conferir tamanho e integridade do arquivo. Nunca enviar dump por chat.
+5. Restaurar em outra base descartável autorizada, verificar contagens e leitura de imagens. Exportação sem restore ensaiado não é recuperação comprovada.
+6. Conferir retenção/download dos backups no hPanel. O indicador diário não comprova backup da VPS.
+
+Nomes dos botões podem variar. Backup e restore remotos não foram executados.
+
+## Flyway remoto/CI — somente após aprovação do alvo
+
+Preparar Flyway CLI 10.20.1 com suporte MySQL/MariaDB. Injetar FLYWAY_URL, FLYWAY_USER e FLYWAY_PASSWORD via secrets, sem argumentos ou logs. URL aponta para a **base nova**, com rede/TLS confirmados. Na raiz do checkout:
+
+```bash
+flyway -locations=filesystem:src/main/resources/db/fresh-migration -baselineOnMigrate=false -cleanDisabled=true -validateMigrationNaming=true info
+flyway -locations=filesystem:src/main/resources/db/fresh-migration -baselineOnMigrate=false -cleanDisabled=true -validateMigrationNaming=true validate
+# Checkpoint humano: confirmar alvo vazio e histórico antes de migrar.
+flyway -locations=filesystem:src/main/resources/db/fresh-migration -baselineOnMigrate=false -cleanDisabled=true -validateMigrationNaming=true migrate
+flyway -locations=filesystem:src/main/resources/db/fresh-migration -baselineOnMigrate=false -cleanDisabled=true -validateMigrationNaming=true validate
+flyway -locations=filesystem:src/main/resources/db/fresh-migration -baselineOnMigrate=false -cleanDisabled=true -validateMigrationNaming=true info
+```
+
+CI remoto deve ser manual, com environment protegido, aprovação, executor único/concurrency e rede autorizada. O workflow verify **não migra banco remoto**. Não abrir 3306 para o mundo. Se bloqueada, avaliar executor na VPS/túnel aprovado. SQL manual exige a reconciliação da etapa 04; não inventar histórico Flyway. Não usar baseline/repair/clean automaticamente.

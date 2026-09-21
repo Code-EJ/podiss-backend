@@ -10,6 +10,8 @@ Java 21, Spring Boot 3.4.1, MariaDB 11.8.9 nos testes/ambiente local e Flyway 10
 2. [Entenda .env, .env.dev e configuração SSH](docs/configuration/environment.md).
 3. [Configure seu acesso local à VPS e faça diagnóstico somente leitura](docs/deployment/vps-access.md).
 4. [Runbook de deploy — pendências explícitas antes de produção](docs/deployment/runbook.md).
+5. [API e Swagger local](docs/api/README.md).
+6. [Fechamento das etapas 01–10](docs/ADRS/0002/relatorios/etapa10-auditoria-final.md).
 
 **Docker local:** use .env.dev, não .env. Nesta máquina ele já foi gerado com credenciais exclusivas locais. Em clone novo, copie .env.dev.example e preencha seguindo o tutorial.
 
@@ -34,6 +36,10 @@ Aplicação em http://localhost:18080. Banco não exposto ao host. `Down` para p
 Tutoriais, Compose, Dockerfile, scripts, testes e modelos ficam no repositório. Nunca versionar senhas, JWT real, chave privada ou volume do banco. Os modelos usam placeholders/vazios, não credenciais reais.
 
 ## Testes e build
+
+Swagger local: http://localhost:18080/swagger-ui/index.html após rebuild. Desabilitado por padrão e em prod. Javadoc com Java 21: .\mvnw.cmd javadoc:javadoc. A geração em target pode emitir avisos de membros sem comentários.
+
+Antes de produção, consulte os [riscos de segurança](docs/ADRS/0002/relatorios/etapa07-seguranca.md). Testes aprovados não liberam automaticamente deploy nem resolvem advisories.
 
 `Dockerfile` compila e executa testes H2 em Java 21. A suíte completa Maven verify usa Testcontainers/MariaDB, exige Docker e não toca a Hostinger. Use o [comando isolado da etapa 04](docs/ADRS/0002/relatorios/etapa04-instalacao-limpa.md) com JDK 21.
 

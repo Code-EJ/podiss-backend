@@ -10,7 +10,7 @@ Créditos: **oEnzoRibas**. Data: 20/09/2026.
 - **PROPOSED:** ADR-0005 de deployment na VPS.
 - **PARTIALLY DONE:** runbook remoto; faltam processo, proxy, banco e mecanismo de restart.
 - **PENDING DECISION / INFORMATION REQUIRED:** topologia real e plano de corte.
-- Etapas 07–10 ainda não concluídas. A autorização de avançar até o final está condicionada a um procedimento de deploy definido; não presumir que o runbook parcial atende essa condição.
+- Atualização: o responsável autorizou explicitamente continuar até a etapa 10. Relatórios 07–10 registram a continuação local; isso não remove os gates de deploy nem torna completo o runbook remoto.
 
 ## Novas informações
 
@@ -40,7 +40,7 @@ docs/configuration/environment.md diferencia arquivo privado/modelo, quem carreg
 
 .env.dev foi gerado com credenciais aleatórias somente locais. Scripts nunca imprimem config expandida. Gitignore protege .local e arquivos reais. O usuário pediu explicitamente tutoriais no Git; modelos, guias e automação são incluídos nos commits, nunca secrets locais.
 
-ADR-0001 é histórico e sua política de update/profile foi parcialmente substituída pela configuração atual e ADR-0003. JWT/TLS/deploy não foram certificados como decisões finais: revisão específica de segurança ainda pendente.
+ADR-0001 é histórico e sua política de update/profile foi parcialmente substituída pela configuração atual e ADR-0003. Consulte a revisão de segurança da etapa 07; TLS/deploy não foram certificados em produção.
 
 ## Organização Git
 

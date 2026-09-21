@@ -2,6 +2,8 @@
 
 Créditos: **oEnzoRibas**.
 
+OpenAPI: springdoc.api-docs.enabled e springdoc.swagger-ui.enabled são false no YAML base e true em dev. Prod herda false. Overrides de configuração são possíveis, mas exposição fora de dev exige revisão (ADR 0006). Não foi criado outro arquivo .env para Swagger.
+
 | Arquivo | Uso | Quem carrega | Vai para Git? |
 | --- | --- | --- | --- |
 | .env | Spring executado diretamente na IDE | EnvFile configurado em .run; não é leitura automática do Spring | Não |
