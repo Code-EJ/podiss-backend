@@ -1,0 +1,13 @@
+# Créditos: oEnzoRibas
+**
+!Dockerfile
+!pom.xml
+!src/
+!src/**
+**/*.p12
+**/*.pfx
+**/*.jks
+**/*.pem
+**/*.key
+**/.env
+**/.env.*

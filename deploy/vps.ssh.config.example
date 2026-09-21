@@ -1,0 +1,12 @@
+# Créditos: oEnzoRibas
+# Copy to .local/vps.ssh.config. Never store an SSH password here.
+Host podiss-vps
+    HostName REPLACE_WITH_VPS_ADDRESS
+    User REPLACE_WITH_EXISTING_SSH_USER
+    Port 22
+    IdentitiesOnly yes
+    # Uncomment only after generating/authorizing your own key:
+    # IdentityFile ~/.ssh/podiss_ed25519
+    StrictHostKeyChecking yes
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
