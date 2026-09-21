@@ -1,288 +1,56 @@
 # PodIss Backend
 
-Backend service for the PodISS podcast platform.
+Backend Spring Boot para o PodIss. Créditos: **oEnzoRibas**.
 
-## About
+Java 21, Spring Boot 3.4.1, MariaDB 11.8.9 nos testes/ambiente local e Flyway 10.20.1. Instalação limpa em inglês; contratos HTTP legados preservados.
 
-The PodISS Backend provides the server-side components required by the PodISS platform, including application logic, data persistence, web services, authentication, and integration with the platform's database.
+## Comece aqui
 
-The application is built with Java and Spring Boot and uses a relational database through Spring Data JPA.
+1. [Tutorial passo a passo: desenvolvimento com Docker](docs/development/local-environment.md).
+2. [Entenda .env, .env.dev e configuração SSH](docs/configuration/environment.md).
+3. [Configure seu acesso local à VPS e faça diagnóstico somente leitura](docs/deployment/vps-access.md).
+4. [Runbook de deploy — pendências explícitas antes de produção](docs/deployment/runbook.md).
 
-## Technologies
-
-* Java 21
-* Spring Boot 3.4.1
-* Spring Web
-* Spring Data JPA
-* Spring Security
-* JSON Web Tokens (JWT)
-* MariaDB
-* H2 Database
-* Lombok
-* Maven
-
-## Requirements
-
-Before running the project, make sure the following software is installed:
-
-* JDK 21
-* Maven 3.9+
-* MariaDB
-* IntelliJ IDEA (optional)
-
-Verify the Java installation:
-
-```bash
-java -version
-```
-
-Verify Maven:
-
-```bash
-mvn -version
-```
-
-## Getting Started
-
-Clone the repository:
-
-```bash
-git clone https://github.com/Code-EJ/pod-iss-backend.git
-cd pod-iss-backend
-```
-
-## Environment Variables
-
-The application uses environment variables for configuration. Create a `.env` file in the project root.
-
-Example:
-
-```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=podiss
-DB_USERNAME=root
-DB_PASSWORD=your_password
-
-JWT_SECRET=your_secret
-```
-
-> The actual variables required by the application may vary depending on the active Spring profile.
-
-The `.env` file may contain sensitive information and **must not be committed to the repository**.
-
-Make sure `.env` is included in `.gitignore`:
-
-```gitignore
-.env
-```
-
-## Running the Application
-
-There are two recommended ways to run the application locally.
-
-### Option 1 — IntelliJ IDEA
-
-IntelliJ IDEA does not automatically load a `.env` file into the application's environment in every configuration. The recommended approach is to configure the `.env` file in the Run/Debug Configuration.
-
-#### Step 1 — Open the project
-
-Open the project directory in IntelliJ IDEA.
-
-Make sure IntelliJ detects:
-
-* Java 21
-* Maven
-* The project's `pom.xml`
-
-#### Step 2 — Create a Run Configuration
-
-Open:
-
-```text
-Run → Edit Configurations...
-```
-
-Click:
-
-```text
-+ → Spring Boot
-```
-
-Configure the application:
-
-* **Name:** `PodIss Backend`
-* **Main class:** select the project's Spring Boot main class
-* **Use classpath of module:** select the backend module
-
-Set the active Spring profile to `dev`.
-
-In **Active profiles**, enter:
-
-```text
-dev
-```
-
-#### Step 3 — Configure the `.env` file
-
-If your IntelliJ IDEA version supports `.env` files directly, locate the **Environment variables** section and configure the `.env` file as the environment source.
-
-Alternatively, if the IDE provides the **EnvFile** option, enable:
-
-```text
-Enable EnvFile
-```
-
-Then add the project's `.env` file:
-
-```text
-.env
-```
-
-The resulting configuration should load the variables defined in:
-
-```text
-<project-root>/.env
-```
-
-For example:
-
-```text
-pod-iss-backend/
-├── .env
-├── pom.xml
-├── src/
-└── ...
-```
-
-#### Step 4 — Run the application
-
-Click **Run** ▶️ in IntelliJ IDEA.
-
-The application will start using:
-
-```text
-Spring profile: dev
-Environment variables: .env
-```
-
-You can also use **Debug** if you need to debug the application.
-
-### Option 2 — Maven from the Terminal
-
-The project can also be started directly through Maven.
-
-#### Linux / macOS / Git Bash
-
-From the project root:
-
-```bash
-export $(grep -v '^#' .env | xargs)
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
-Or as a single command:
-
-```bash
-export $(grep -v '^#' .env | xargs) && mvn spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
-#### Windows PowerShell
-
-PowerShell does not support the `export` command used above.
-
-You can load the `.env` variables and start Maven with:
+**Docker local:** use .env.dev, não .env. Nesta máquina ele já foi gerado com credenciais exclusivas locais. Em clone novo, copie .env.dev.example e preencha seguindo o tutorial.
 
 ```powershell
-Get-Content .env | Where-Object { $_ -and $_ -notmatch '^#' } | ForEach-Object {
-    $name, $value = $_ -split '=', 2
-    [Environment]::SetEnvironmentVariable($name, $value)
-}
-
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
+.\scripts\dev.ps1 Up
+.\scripts\dev.ps1 Status
+.\scripts\dev.ps1 Validate
 ```
 
-If your `.env` contains values with spaces or more complex shell syntax, configure the environment variables directly in the terminal or IntelliJ instead.
+Aplicação em http://localhost:18080. Banco não exposto ao host. `Down` para parar preservando volume. Não copie o Compose de desenvolvimento para a VPS.
 
-#### Windows CMD
+**IDE sem Docker:** .run usa EnvFile/.env e profile dev; precisa de MariaDB local previamente migrado. Spring não carrega .env sozinho. O fluxo Compose é o ponto de entrada recomendado para uma instalação isolada.
 
-CMD does not have native `.env` loading. The recommended approach on Windows is to use IntelliJ IDEA, PowerShell, Git Bash, or another shell capable of loading the variables.
+## Qual arquivo vai para o Git?
 
-## Build the Project
+| Real, privado — não versionar | Modelo versionado |
+| --- | --- |
+| .env — IDE | .env.example |
+| .env.dev — Docker local | .env.dev.example |
+| .local/vps.ssh.config — SSH | deploy/vps.ssh.config.example |
 
-To compile and package the application:
+Tutoriais, Compose, Dockerfile, scripts, testes e modelos ficam no repositório. Nunca versionar senhas, JWT real, chave privada ou volume do banco. Os modelos usam placeholders/vazios, não credenciais reais.
 
-```bash
-mvn clean install
-```
+## Testes e build
 
-To perform a complete build including tests:
+`Dockerfile` compila e executa testes H2 em Java 21. A suíte completa Maven verify usa Testcontainers/MariaDB, exige Docker e não toca a Hostinger. Use o [comando isolado da etapa 04](docs/ADRS/0002/relatorios/etapa04-instalacao-limpa.md) com JDK 21.
 
-```bash
-mvn clean verify
-```
+Workflow de verificação: .github/workflows/verify.yml. Não há deploy/push de imagem automático.
 
-## Testing
+## Banco e decisões
 
-Run the test suite with:
+- Cadeia ativa: src/main/resources/db/fresh-migration.
+- Banco vazio dedicado; não aplicar como upgrade de schema legado.
+- Flyway externo e Hibernate validate; startup da aplicação não executa migrations.
+- [ADR de evolução do banco](docs/ADRS/0003-database-schema-evolution.md).
+- [ADR de desenvolvimento local](docs/ADRS/0004-local-development.md).
+- [ADR de deploy na VPS — Proposed](docs/ADRS/0005-vps-deployment.md).
+- [Plano mestre e etapas](docs/ADRS/0002/master-plan.md).
+- [Relatório da etapa 04](docs/ADRS/0002/relatorios/etapa04-instalacao-limpa.md).
 
-```bash
-mvn test
-```
-
-## Running with a Specific Spring Profile
-
-The development profile can be explicitly selected with:
-
-```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
-When using IntelliJ IDEA, configure the active profile as:
-
-```text
-dev
-```
-
-## Configuration
-
-Environment-specific configuration should not be committed to the repository when it contains sensitive information.
-
-Credentials, authentication secrets, database passwords, and other sensitive configuration values must be provided through environment variables or external configuration mechanisms.
-
-The recommended local development setup is:
-
-```text
-.env
-   ↓
-Environment variables
-   ↓
-Spring Boot
-   ↓
-application-dev configuration
-```
-
-Never commit real database credentials, JWT secrets, API keys, or other sensitive values.
-
-## Versioning
-
-This project follows Semantic Versioning:
-
-```text
-MAJOR.MINOR.PATCH
-```
-
-For example:
-
-```text
-1.0.0
-1.1.0
-1.1.1
-```
-
-* **MAJOR** — incompatible or breaking changes.
-* **MINOR** — new functionality that remains backward compatible.
-* **PATCH** — backward-compatible bug fixes.
+VPS Ubuntu 24.04 confirmada pelo responsável. O backend/processo/proxy e a localização do banco ainda precisam ser inventariados antes do deploy. Estar na Hostinger não significa que frontend, banco e Java estejam no mesmo serviço.
 
 ## Contributing
 

@@ -1,5 +1,7 @@
 # Application Runtime Configuration & Resources
 
+Créditos: oEnzoRibas. Atualizado para a instalação limpa da etapa 04.
+
 Diretório de recursos e configurações de execução da aplicação Spring Boot (`podiss-backend`).
 
 ---
@@ -10,8 +12,8 @@ A aplicação adota a convenção de profiles do Spring Boot (`application-{prof
 
 * **`application.yaml` (Base):** Contém todas as configurações globais, mapeamento de variáveis de ambiente, validações de payload (`multipart`), limites de taxa (`submissions`), definições do pool HikariCP e configurações comuns do JPA/Hibernate.
 * **`application-dev.yaml` (Dev Local):** Ativado com `SPRING_PROFILES_ACTIVE=dev`.
-    * Habilita `show-sql: true` no Hibernate.
-    * Habilita `spring.flyway.baseline-on-migrate: true` para facilitar a inicialização de bases locais de desenvolvimento.
+    * Mantém `show-sql: false` no Hibernate.
+    * Desativa migrations no startup e baseline automático, assim como a configuração base.
 * **`application-prod.yaml` (Produção):** Ativado com `SPRING_PROFILES_ACTIVE=prod`.
     * Força a desativação de exibição de SQLs no console.
     * Fornece suporte opcional a SSL/TLS nativo via Keystore (PKCS12) caso a terminação TLS não ocorra em camada de Reverse Proxy.
@@ -39,14 +41,17 @@ A aplicação falhará durante a inicialização caso variáveis obrigatórias n
 
 ## 🗄 Migração de Banco de Dados (Flyway)
 
-* Os scripts DDL/DML de migração devem ser armazenados em `src/main/resources/db/migration/`.
+* A instalação nova usa exclusivamente `src/main/resources/db/fresh-migration/`.
+* `db/migration/` e a V2 Java são legado preservado; não combinar as duas cadeias.
+* Flyway está desativado no startup; aplicar a cadeia nova por executor externo antes de iniciar a aplicação com `ddl-auto=validate`.
 * Convenção de nome: `V<VERSAO>__<DESCRICAO>.sql` (ex: `V1__create_users_table.sql`).
-* Em ambiente de **Produção**, as propriedades `baseline-on-migrate` e `clean-disabled` estão travadas para prevenir manipulações destrutivas involuntárias na base de dados.
+* Os defaults são `baseline-on-migrate=false` e `clean-disabled=true`. Propriedades externas podem sobrescrevê-los: conferir a configuração efetiva. Não fazer baseline em banco vazio.
+* Veja o [relatório da etapa 04](../../../docs/ADRS/0002/relatorios/etapa04-instalacao-limpa.md) para testes, CLI e pendências de deploy. O plano Business Web Hosting não oferece suporte ao runtime Java.
 
 ---
 
 ## 🚀 Bootstrap Pattern (`app.bootstrap`)
 
-Se a tabela de usuários da base estiver vazia no momento da inicialização da aplicação, o serviço de bootstrap utilizará as credenciais definidas em `app.bootstrap.*` para instanciar a conta administrativa raiz.
+Com as três credenciais `app.bootstrap.*` válidas, o bootstrap cria um ADMIN se ainda não existir nenhum. Não promove usuário existente; conflitos de username/email impedem o provisionamento.
 
-> **Importante de Segurança:** Em ambiente produtivo, defina uma senha forte via variável de ambiente `ADMIN_PASSWORD` na primeira execução e remova a variável do ambiente após o provisionamento do admin.
+> Em produção, forneça credenciais fortes fora do código. Após confirmar o provisionamento, remova as três variáveis ADMIN_USERNAME/ADMIN_EMAIL/ADMIN_PASSWORD juntas; deixar apenas parte delas pode impedir o startup.

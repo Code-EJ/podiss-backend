@@ -1,5 +1,7 @@
 # ADR-0001: Environment-Based Configuration
 
+> Historical decision. The dev `ddl-auto=update` policy and older profile filenames below are superseded by [ADR-0003](../0003-database-schema-evolution.md) and the [current environment guide](../../configuration/environment.md). Current dev/prod use `validate`, `.yaml` files and an external Flyway executor. Credits: oEnzoRibas.
+
 **Status:** Accepted  
 **Date:** 2026-08-29
 
