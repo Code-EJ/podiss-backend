@@ -10,6 +10,7 @@ import java.util.List;
  * @author oEnzoRibas
  */
 @Data
+@io.swagger.v3.oas.annotations.media.Schema(description = "Multipart fields; tags list and image are optional.")
 public class CreatePostRequest {
     @NotBlank @Size(max = 255) private String title;
     @NotBlank @Size(max = 10000) private String description;

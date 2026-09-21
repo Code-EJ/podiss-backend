@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
  *
  * @author oEnzoRibas
  */
+@io.swagger.v3.oas.annotations.media.Schema(description = "Portuguese JSON fields are intentional legacy contract names.")
 public record CreateContactMessageRequest(
     @NotBlank @Size(max = 255) String nome,
     @NotBlank @Email @Size(max = 254) String email,

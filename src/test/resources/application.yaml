@@ -6,6 +6,7 @@ spring:
     username: sa
     password:
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: create-drop
     show-sql: false
@@ -13,6 +14,8 @@ spring:
     enabled: false
 
 app:
+  cors:
+    allowed-origins: http://localhost:5173
   jwt:
     secret: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
     issuer: podiss-backend-test

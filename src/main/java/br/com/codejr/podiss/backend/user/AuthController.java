@@ -19,11 +19,13 @@ public class AuthController {
     private final JwtTokenService tokens;
     private final UserService users;
     @PostMapping("/register") @PreAuthorize("hasRole('ADMIN')")
+    @io.swagger.v3.oas.annotations.Operation(summary = "Register account", description = "ADMIN creates account; omitted role defaults to USER. Returns a success string.")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
         users.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("Usuário registrado com sucesso!");
     }
     @PostMapping("/login")
+    @io.swagger.v3.oas.annotations.Operation(summary = "Authenticate", description = "Returns token for Authorization: Bearer requests; passwords are never returned.")
     public JwtResponse login(@Valid @RequestBody LoginRequest request) {
         var authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.username(), request.password()));

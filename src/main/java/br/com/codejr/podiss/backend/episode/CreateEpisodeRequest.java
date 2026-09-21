@@ -6,5 +6,6 @@ import jakarta.validation.constraints.*;
  *
  * @author oEnzoRibas
  */
+@io.swagger.v3.oas.annotations.media.Schema(description = "YouTube URL with optional description override.")
 public record CreateEpisodeRequest(@NotBlank @Size(max = 2048) String videoUrl,
                               @Size(max = 10000) String description) {}

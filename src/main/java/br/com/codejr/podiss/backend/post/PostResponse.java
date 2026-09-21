@@ -8,6 +8,7 @@ import java.util.UUID;
  *
  * @author oEnzoRibas
  */
+@io.swagger.v3.oas.annotations.media.Schema(description = "Summary with comma-separated tags and relative image URL; no image bytes.")
 public record PostResponse(UUID id, String title, String description, String tags,
                            Timestamp createdAt, boolean hasImage) {
     @JsonProperty public String imageUrl() { return hasImage ? "/posts/image/" + id : null; }

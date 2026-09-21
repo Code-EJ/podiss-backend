@@ -6,8 +6,10 @@ import jakarta.validation.constraints.*;
  *
  * @author oEnzoRibas
  */
+@io.swagger.v3.oas.annotations.media.Schema(description = "Administrator-created account; omitted role defaults to USER. Password maximum 72 UTF-8 bytes.")
 public record RegisterRequest(
     @NotBlank @Size(max = 100) @Pattern(regexp = "[a-zA-Z0-9._-]+") String username,
+    @io.swagger.v3.oas.annotations.media.Schema(accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.WRITE_ONLY, format = "password")
     @NotBlank @Size(min = 12, max = 72) String password,
     @NotBlank @Email @Size(max = 254) String email,
     User.Role role) {}

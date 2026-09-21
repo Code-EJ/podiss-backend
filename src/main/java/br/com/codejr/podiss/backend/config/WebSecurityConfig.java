@@ -48,12 +48,15 @@ public class WebSecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtRequestFilter jwt,
             SubmissionRateLimitFilter limit, JwtAuthenticationEntryPoint entry, ObjectMapper mapper,
-            @org.springframework.beans.factory.annotation.Qualifier("corsConfigurationSource") CorsConfigurationSource cors) throws Exception {
+            @org.springframework.beans.factory.annotation.Qualifier("corsConfigurationSource") CorsConfigurationSource cors,
+            @Value("${springdoc.api-docs.enabled:false}") boolean docsEnabled) throws Exception {
         return http.csrf(c -> c.disable()).cors(c -> c.configurationSource(cors))
             .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(c -> c
                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/v3/api-docs.yaml", "/swagger-ui.html", "/swagger-ui/**")
+                    .access((authentication, context) -> new org.springframework.security.authorization.AuthorizationDecision(docsEnabled))
                 .requestMatchers(HttpMethod.POST, "/api/auth/login", "/contatos", "/sugestoes").permitAll()
                 .requestMatchers(HttpMethod.GET, "/posts", "/posts/**", "/episodes", "/episodes/**").permitAll()
                 .anyRequest().hasRole("ADMIN"))

@@ -16,10 +16,12 @@ import java.util.List;
 public class ContactMessageController {
     private final ContactMessageService service;
     @PostMapping
+    @io.swagger.v3.oas.annotations.Operation(summary = "Submit contact message", description = "Accepts nome, email, assunto and mensagem; subject to per-address quota.")
     public ResponseEntity<ContactMessage> create(@Valid @RequestBody CreateContactMessageRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
     }
     @GetMapping @PreAuthorize("hasRole('ADMIN')")
+    @io.swagger.v3.oas.annotations.Operation(summary = "List contact messages", description = "Returns a paginated array containing personal contact data.")
     public ResponseEntity<List<ContactMessage>> list(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size, @RequestParam(defaultValue = "asc") String order) {
         return PaginationSupport.response(service.list(PaginationSupport.request(page, size, order)));

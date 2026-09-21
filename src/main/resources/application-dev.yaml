@@ -1,3 +1,9 @@
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
 # application-dev.yaml
 # Author: oEnzoRibas
 server:

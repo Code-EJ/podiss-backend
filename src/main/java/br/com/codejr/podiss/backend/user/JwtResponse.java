@@ -11,6 +11,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
+@io.swagger.v3.oas.annotations.media.Schema(description = "Bearer token; treat as a secret.")
 public class JwtResponse {
     private String token;
 }
