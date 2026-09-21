@@ -9,10 +9,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+/**
+ * Creates accounts with normalized email and BCrypt hashes, and loads current authorities for authentication. HTTP callers must enforce administrator authorization on registration.
+ *
+ * @author oEnzoRibas
+ */
 @Service @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
     private final UserRepository repository;
     private final PasswordEncoder encoder;
+    /**
+     * Persists an account and hashes its password; callers must validate the DTO and authorization.
+     * @param request validated account fields, with an optional role
+     * @return persisted account; never serialize its password hash to clients
+     * @throws ApiException for known duplicates or passwords exceeding 72 UTF-8 bytes
+     * @throws org.springframework.dao.DataIntegrityViolationException for concurrent uniqueness conflicts
+     */
     @Transactional
     public User register(RegisterRequest request) {
         String email = request.email().trim().toLowerCase(Locale.ROOT);

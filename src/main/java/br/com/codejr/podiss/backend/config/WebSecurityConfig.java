@@ -19,6 +19,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.*;
 import java.util.*;
+/**
+ * Defines stateless Bearer authentication, explicit public routes and administrator-only fallback. Servlet filter auto-registration is disabled to avoid duplicate execution.
+ *
+ * @author oEnzoRibas
+ */
 @Configuration @EnableMethodSecurity
 public class WebSecurityConfig {
     @Bean

@@ -10,6 +10,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.http.ProblemDetail;
 
+/**
+ * Writes ProblemDetail from security filters, where MVC exception advice is not available.
+ *
+ * @author oEnzoRibas
+ */
 public final class ProblemResponseWriter {
     private ProblemResponseWriter() {}
     public static void write(HttpServletResponse response, ObjectMapper mapper, int status, String detail) throws IOException {

@@ -6,6 +6,11 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.sql.Timestamp;
 import java.util.UUID;
+/**
+ * Published YouTube episode. Internal UUID identifies deletion; case-sensitive YouTube ID identifies public lookup.
+ *
+ * @author oEnzoRibas
+ */
 @Entity(name = "Video") @Table(name = "episodes") @Getter @Setter @NoArgsConstructor
 public class Episode {
     @Id @GeneratedValue @JdbcTypeCode(SqlTypes.UUID) @Column(name = "id")

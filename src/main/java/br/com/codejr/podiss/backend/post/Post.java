@@ -6,6 +6,11 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.sql.Timestamp;
 import java.util.UUID;
+/**
+ * Editorial post with optional image bytes stored separately from list projections. Tags persist as a comma-separated string.
+ *
+ * @author oEnzoRibas
+ */
 @Entity @Table(name = "posts") @Getter @Setter @NoArgsConstructor
 public class Post {
     @Id @GeneratedValue @JdbcTypeCode(SqlTypes.UUID) @Column(name = "id")

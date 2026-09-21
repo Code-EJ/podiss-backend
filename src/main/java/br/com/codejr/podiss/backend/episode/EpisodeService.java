@@ -8,6 +8,11 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
+/**
+ * Coordinates validated YouTube metadata retrieval and episode persistence. Duplicate provider IDs conflict; absent records are not found.
+ *
+ * @author oEnzoRibas
+ */
 @Service("videoService") @RequiredArgsConstructor
 public class EpisodeService {
     private final EpisodeRepository repository;
@@ -19,6 +24,12 @@ public class EpisodeService {
         return repository.findByYoutubeId(id)
             .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Episódio não encontrado."));
     }
+    /**
+     * Resolves remote metadata before opening the repository write transaction.
+     * @param request validated URL and optional description override
+     * @return persisted episode with canonical URL
+     * @throws ApiException for invalid URL, duplicate episode or unavailable provider
+     */
     public Episode create(CreateEpisodeRequest request) {
         String id = YouTubeUrl.id(request.videoUrl());
         if (repository.existsByYoutubeId(id)) throw new ApiException(HttpStatus.CONFLICT, "Episódio já cadastrado.");

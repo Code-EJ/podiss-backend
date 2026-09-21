@@ -9,6 +9,11 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
+/**
+ * Issues HS512 tokens and verifies signature, issuer, expiration and subject. Immutable signing configuration is shared across requests; tokens have no individual revocation store.
+ *
+ * @author oEnzoRibas
+ */
 @Component("jwtTokenUtil")
 public class JwtTokenService {
     private final Key key;
@@ -26,6 +31,13 @@ public class JwtTokenService {
         this.issuer = issuer;
         this.ttl = ttl;
     }
+    /**
+     * Verifies a token before returning its subject; no database lookup occurs here.
+     * @param token compact signed JWT, without the Bearer prefix
+     * @return nonblank username from verified claims
+     * @throws JwtException if signature, issuer, expiration or required claims are invalid
+     * @throws IllegalArgumentException if the supplied token is empty
+     */
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(key).requireIssuer(issuer).build()
             .parseClaimsJws(token).getBody();

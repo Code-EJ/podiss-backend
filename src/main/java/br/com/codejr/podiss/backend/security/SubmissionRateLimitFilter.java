@@ -10,6 +10,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.*;
 import java.util.*;
+/**
+ * Per-process fixed-window limiter for public submissions. Synchronized reservation protects shared state; client identity uses the socket address, not untrusted forwarding headers.
+ *
+ * @author oEnzoRibas
+ */
 @Component
 public class SubmissionRateLimitFilter extends OncePerRequestFilter {
     private final Map<String, Window> windows = new HashMap<>();

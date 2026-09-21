@@ -8,6 +8,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
+/**
+ * Exposes public editorial reads and administrator-only writes. Creation and image replacement are multipart; text updates are JSON.
+ *
+ * @author oEnzoRibas
+ */
 @RestController @RequestMapping("/posts") @RequiredArgsConstructor
 public class PostController {
     private final PostService service;

@@ -6,9 +6,20 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+/**
+ * Validates upload size and recognized image signatures. This is not full image decoding or a malware scanner.
+ *
+ * @author oEnzoRibas
+ */
 @Component
 public class ImageValidator {
     public record Image(byte[] bytes, String contentType) {}
+    /**
+     * Reads a bounded upload and derives its MIME type from bytes rather than client metadata.
+     * @param file nonempty upload, at most 5 MiB
+     * @return bytes and detected MIME type; bytes are not defensively copied
+     * @throws ApiException for empty, oversized, unreadable or unrecognized uploads
+     */
     public Image read(MultipartFile file) {
         if (file == null || file.isEmpty())
             throw new ApiException(HttpStatus.BAD_REQUEST, "Envie uma imagem não vazia.");

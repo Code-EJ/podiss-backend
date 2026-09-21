@@ -3,6 +3,11 @@ package br.com.codejr.podiss.backend.post;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.domain.*;
 import java.util.UUID;
+/**
+ * Projects post summaries without loading image blobs. Image availability is derived from persisted content type.
+ *
+ * @author oEnzoRibas
+ */
 public interface PostRepository extends JpaRepository<Post, UUID> {
     @Query("select new br.com.codejr.podiss.backend.post.PostResponse(p.id, p.title, p.description, p.tags, p.createdAt, " +
            "case when p.imageContentType is not null then true else false end) from Post p")

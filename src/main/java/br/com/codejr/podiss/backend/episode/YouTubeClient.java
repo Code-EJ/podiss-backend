@@ -10,6 +10,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.net.SocketTimeoutException;
 import java.net.http.HttpTimeoutException;
+/**
+ * Retrieves metadata only from fixed YouTube endpoints. Optional API credentials select the Data API; otherwise oEmbed is used.
+ *
+ * @author oEnzoRibas
+ */
 @Component
 public class YouTubeClient {
     public record Metadata(String title, String description, String thumbnailUrl) {}

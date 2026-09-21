@@ -6,6 +6,11 @@ import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import java.net.http.HttpClient;
 import java.time.Duration;
+/**
+ * Builds the outbound metadata client with bounded timeouts and redirects disabled to keep destinations controlled.
+ *
+ * @author oEnzoRibas
+ */
 @Configuration
 public class YouTubeConfig {
     @Bean

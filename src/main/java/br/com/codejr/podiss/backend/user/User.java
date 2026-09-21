@@ -5,6 +5,11 @@ import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.util.UUID;
+/**
+ * Stored account with BCrypt password hash and explicit role. This entity must not be returned as a public HTTP response.
+ *
+ * @author oEnzoRibas
+ */
 @Entity @Table(name = "users") @Getter @Setter @NoArgsConstructor
 public class User {
     @Id @GeneratedValue @JdbcTypeCode(SqlTypes.UUID) @Column(name = "id")

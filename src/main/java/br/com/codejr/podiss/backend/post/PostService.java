@@ -10,6 +10,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
+/**
+ * Owns transactional editorial writes and image lifecycle. Read projections avoid loading blobs except for the image endpoint.
+ *
+ * @author oEnzoRibas
+ */
 @Service @RequiredArgsConstructor @Transactional
 public class PostService {
     private final PostRepository repository;
@@ -27,6 +32,13 @@ public class PostService {
     public Page<PostResponse> list(Pageable page) { return repository.findSummaries(page); }
     @Transactional(readOnly = true)
     public PostResponse get(UUID id) { return PostResponse.from(required(id)); }
+    /**
+     * Updates only supplied text fields; nulls preserve existing values and images are untouched.
+     * @param id internal post UUID
+     * @param request validated partial fields; an empty tags list clears tags
+     * @return summary after persistence
+     * @throws ApiException if absent or if tags contain commas or normalize to blanks
+     */
     public PostResponse update(UUID id, UpdatePostRequest request) {
         Post post = required(id);
         if (request.title() != null) post.setTitle(request.title().trim());

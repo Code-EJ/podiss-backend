@@ -4,6 +4,11 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
+/**
+ * Multipart post creation fields. Tags are submitted as a list and normalized by the service; the image is optional.
+ *
+ * @author oEnzoRibas
+ */
 @Data
 public class CreatePostRequest {
     @NotBlank @Size(max = 255) private String title;

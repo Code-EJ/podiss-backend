@@ -7,6 +7,11 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+/**
+ * Accepts public topic suggestions and restricts paginated reading to administrators.
+ *
+ * @author oEnzoRibas
+ */
 @RestController("sugestaoController") @RequestMapping("/sugestoes") @RequiredArgsConstructor
 public class TopicSuggestionController {
     private final TopicSuggestionService service;

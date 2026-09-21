@@ -8,6 +8,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+/**
+ * Authenticates credentials and issues tokens. Registration is an administrator operation, not public self-registration.
+ *
+ * @author oEnzoRibas
+ */
 @RestController @RequestMapping("/api/auth") @RequiredArgsConstructor
 public class AuthController {
     private final AuthenticationManager authenticationManager;

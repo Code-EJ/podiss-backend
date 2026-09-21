@@ -7,6 +7,11 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.sql.Timestamp;
 import java.util.UUID;
+/**
+ * Visitor-proposed episode topic containing personal contact data. Legacy JSON names remain independent of English database columns.
+ *
+ * @author oEnzoRibas
+ */
 @Entity(name = "Sugestao") @Table(name = "topic_suggestions") @Getter @Setter @NoArgsConstructor
 public class TopicSuggestion {
     @Id @GeneratedValue @JdbcTypeCode(SqlTypes.UUID) @Column(name = "id")

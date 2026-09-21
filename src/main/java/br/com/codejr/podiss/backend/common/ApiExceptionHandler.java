@@ -12,6 +12,11 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 
+/**
+ * Translates expected domain, validation and persistence failures into ProblemDetail responses without database internals.
+ *
+ * @author oEnzoRibas
+ */
 @RestControllerAdvice
 public class ApiExceptionHandler {
 

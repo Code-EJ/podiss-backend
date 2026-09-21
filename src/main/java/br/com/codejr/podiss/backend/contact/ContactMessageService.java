@@ -6,6 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.*;
 import java.sql.Timestamp;
 import java.time.Instant;
+/**
+ * Trims validated contact input and timestamps it at insertion. Transactional creation flushes constraints before returning.
+ *
+ * @author oEnzoRibas
+ */
 @Service("contatoService") @RequiredArgsConstructor
 public class ContactMessageService {
     private final ContactMessageRepository repository;

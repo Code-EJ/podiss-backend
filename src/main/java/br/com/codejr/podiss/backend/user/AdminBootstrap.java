@@ -6,6 +6,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+/**
+ * Optionally creates the first administrator at startup. All credentials absent is a no-op; existing accounts are never silently elevated or overwritten.
+ *
+ * @author oEnzoRibas
+ */
 @Component @RequiredArgsConstructor
 public class AdminBootstrap implements ApplicationRunner {
     private final UserRepository repository;

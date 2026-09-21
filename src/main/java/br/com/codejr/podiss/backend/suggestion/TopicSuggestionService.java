@@ -6,6 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.*;
 import java.sql.Timestamp;
 import java.time.Instant;
+/**
+ * Normalizes validated suggestions and records creation time. Constraint failures surface inside the creation transaction.
+ *
+ * @author oEnzoRibas
+ */
 @Service("sugestaoService") @RequiredArgsConstructor
 public class TopicSuggestionService {
     private final TopicSuggestionRepository repository;

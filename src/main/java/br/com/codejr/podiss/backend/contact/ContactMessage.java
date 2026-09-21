@@ -7,6 +7,11 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.sql.Timestamp;
 import java.util.UUID;
+/**
+ * A visitor message containing personal contact data. JSON retains Portuguese names while physical columns use English; listing requires administrator access.
+ *
+ * @author oEnzoRibas
+ */
 @Entity(name = "Contato") @Table(name = "contact_messages") @Getter @Setter @NoArgsConstructor
 public class ContactMessage {
     @Id @GeneratedValue @JdbcTypeCode(SqlTypes.UUID) @Column(name = "id")

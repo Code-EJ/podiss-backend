@@ -7,6 +7,11 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
+/**
+ * Publishes episode metadata with public reads and administrator-only writes. Lookup and deletion intentionally use different identifiers.
+ *
+ * @author oEnzoRibas
+ */
 @RestController("videoController") @RequestMapping("/episodes") @RequiredArgsConstructor
 public class EpisodeController {
     private final EpisodeService service;

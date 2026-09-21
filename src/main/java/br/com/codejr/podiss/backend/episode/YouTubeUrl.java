@@ -5,8 +5,19 @@ import org.springframework.http.HttpStatus;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+/**
+ * Validates supported YouTube URL shapes and extracts an eleven-character ID without performing network access.
+ *
+ * @author oEnzoRibas
+ */
 public final class YouTubeUrl {
     private YouTubeUrl() {}
+    /**
+     * Extracts an ID from an allowlisted provider URL without following it.
+     * @param value absolute HTTP(S) YouTube URL without user info or explicit port
+     * @return case-preserved eleven-character video ID
+     * @throws ApiException if the host, URL shape or identifier is unsupported
+     */
     public static String id(String value) {
         try {
             URI uri = URI.create(value);

@@ -11,6 +11,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+/**
+ * Validates Bearer tokens and reloads current user authorities. Invalid presented credentials fail even on otherwise public paths.
+ *
+ * @author oEnzoRibas
+ */
 @Component @RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
     private final UserService users;
