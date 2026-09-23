@@ -43,8 +43,7 @@
             <name>Enzo Rocha Leite Diniz Ribas</name>
             <email>ribas.enzo@juniorcode.com.br</email>
             <organization>Code Soluções em Tecnologia Júnior</organization>
-            <!--<organizationUrl>https://codesolucoes.com.br</organizationUrl>
-            TODO: PREENCHER ASSIM QUE O SITE DA CODE ESTIVER NO AR.-->
+            <organizationUrl>https://juniorcode.com.br/</organizationUrl>
             <roles>
                 <role>developer</role>
                 <role>tech-lead</role>
@@ -62,7 +61,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <jjwt.version>0.11.5</jjwt.version>
+        <jjwt.version>0.12.6</jjwt.version>
     </properties>
 
     <dependencies>
