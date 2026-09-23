@@ -6,7 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.time.Duration;
 import java.util.Date;
 /**
@@ -16,7 +16,7 @@ import java.util.Date;
  */
 @Component("jwtTokenUtil")
 public class JwtTokenService {
-    private final Key key;
+    private final SecretKey key;
     private final String issuer;
     private final Duration ttl;
     public JwtTokenService(@Value("${app.jwt.secret}") String secret,
@@ -39,16 +39,16 @@ public class JwtTokenService {
      * @throws IllegalArgumentException if the supplied token is empty
      */
     public String getUsernameFromToken(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).requireIssuer(issuer).build()
-            .parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parser().verifyWith(key).requireIssuer(issuer).build()
+            .parseSignedClaims(token).getPayload();
         if (claims.getExpiration() == null || claims.getSubject() == null || claims.getSubject().isBlank())
             throw new MalformedJwtException("Token sem expiração ou usuário.");
         return claims.getSubject();
     }
     public String generateToken(UserDetails user) {
         long now = System.currentTimeMillis();
-        return Jwts.builder().setIssuer(issuer).setSubject(user.getUsername())
-            .setIssuedAt(new Date(now)).setExpiration(new Date(now + ttl.toMillis()))
-            .signWith(key, SignatureAlgorithm.HS512).compact();
+        return Jwts.builder().issuer(issuer).subject(user.getUsername())
+            .issuedAt(new Date(now)).expiration(new Date(now + ttl.toMillis()))
+            .signWith(key, Jwts.SIG.HS512).compact();
     }
 }

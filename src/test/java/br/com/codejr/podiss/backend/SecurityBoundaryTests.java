@@ -5,11 +5,14 @@ import br.com.codejr.podiss.backend.episode.YouTubeUrl;
 import br.com.codejr.podiss.backend.post.ImageValidator;
 import br.com.codejr.podiss.backend.security.JwtTokenService;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.User;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.Date;
 import static org.assertj.core.api.Assertions.*;
 
 /** Local regression guards for security boundaries; not an exploit or penetration test.
@@ -34,6 +37,21 @@ class SecurityBoundaryTests {
         byte[] other = new byte[64]; other[0] = 1;
         assertThatThrownBy(() -> new JwtTokenService(Base64.getEncoder().encodeToString(other), "test",
             Duration.ofHours(1)).getUsernameFromToken(token)).isInstanceOf(JwtException.class);
+    }
+    @Test void jwt012PreservesHs512AndRejectsMissingOrExpiredClaims() {
+        var service = new JwtTokenService(key, "test", Duration.ofHours(1));
+        var signingKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(key));
+        var user = User.withUsername("local-test").password("unused").roles("USER").build();
+        var parsed = Jwts.parser().verifyWith(signingKey).build().parseSignedClaims(service.generateToken(user));
+        assertThat(parsed.getHeader().getAlgorithm()).isEqualTo("HS512");
+        for (String invalid : new String[]{
+                Jwts.builder().issuer("test").subject("local-test").signWith(signingKey, Jwts.SIG.HS512).compact(),
+                Jwts.builder().issuer("test").expiration(new Date(System.currentTimeMillis() + 60000))
+                    .signWith(signingKey, Jwts.SIG.HS512).compact(),
+                Jwts.builder().issuer("test").subject("local-test").expiration(new Date(1000))
+                    .signWith(signingKey, Jwts.SIG.HS512).compact()}) {
+            assertThatThrownBy(() -> service.getUsernameFromToken(invalid)).isInstanceOf(JwtException.class);
+        }
     }
     @Test void youtubeRejectsArbitraryDestinations() {
         for (String url : new String[]{"https://example.com/watch?v=abcdefghijk",
