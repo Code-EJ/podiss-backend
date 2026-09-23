@@ -1,9 +1,15 @@
-// src/main/java/com/code/yolanda/back/user/UserRepository.java
+// Créditos: oEnzoRibas
 package br.com.codejr.podiss.backend.user;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
-
+/**
+ * Account lookup and uniqueness prechecks. findByUsername returns null when absent; database constraints protect concurrent writes.
+ *
+ * @author oEnzoRibas
+ */
 public interface UserRepository extends JpaRepository<User, UUID> {
     User findByUsername(String username);
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
+    boolean existsByRole(User.Role role);
 }

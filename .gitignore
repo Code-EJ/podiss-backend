@@ -37,3 +37,8 @@ build/
 .env
 .env.*
 !.env.example
+!.env.dev.example
+.run/BackApplication.run.xml
+
+# Local SSH configuration, credentials and deployment artifacts
+.local/

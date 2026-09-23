@@ -1,22 +1,16 @@
-# application-dev.yml
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+# application-dev.yaml
+# Author: oEnzoRibas
 server:
   port: 8080
-
 spring:
-  datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    
-    hikari:
-      max-lifetime: ${HIKARI_MAX_LIFETIME}
-  
+  flyway:
+    enabled: false
+    baseline-on-migrate: false
   jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-
-app:
-  cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS}
+    show-sql: false
