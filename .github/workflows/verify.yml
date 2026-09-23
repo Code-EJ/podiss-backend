@@ -19,7 +19,7 @@ jobs:
           cache: maven
       - name: H2 contracts and disposable MariaDB integration tests
         run: >-
-          bash mvnw -B -ntp clean verify
+          bash ./mvnw -B -ntp clean verify
           -Dapi.version=1.44
           -Dspring.profiles.active=ci
           -Dspring.flyway.enabled=false
