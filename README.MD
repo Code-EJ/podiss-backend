@@ -8,10 +8,11 @@ Java 21, Spring Boot 3.4.1, MariaDB 11.8.9 nos testes/ambiente local e Flyway 10
 
 1. [Tutorial passo a passo: iniciar no Git Bash/PowerShell, testar a API e conferir o banco](docs/development/local-environment.md).
 2. [Entenda .env, .env.dev e configuração SSH](docs/configuration/environment.md).
-3. [Configure seu acesso local à VPS e faça diagnóstico somente leitura](docs/deployment/vps-access.md).
-4. [Runbook de deploy — pendências explícitas antes de produção](docs/deployment/runbook.md).
-5. [API e Swagger local](docs/api/README.md).
-6. [Fechamento das etapas 01–10](docs/ADRS/0002/relatorios/etapa10-auditoria-final.md).
+3. [Configure seu acesso local à VPS](docs/deployment/vps-access.md).
+4. [Runbook de produção — Hostinger VPS](docs/deployment/hostinger/vps/README.md).
+5. [Runbook preliminar/histórico de deploy](docs/deployment/runbook.md).
+6. [API e Swagger local](docs/api/README.md).
+7. [Fechamento das etapas 01–10](docs/ADRS/0002/relatorios/etapa10-auditoria-final.md).
 
 **Docker local:** use .env.dev, não .env. Nesta máquina ele já foi gerado com credenciais exclusivas locais. Em clone novo, copie .env.dev.example e preencha seguindo o tutorial.
 
@@ -74,7 +75,7 @@ Workflow de verificação: .github/workflows/verify.yml. Não há deploy/push de
 - [Plano mestre e etapas](docs/ADRS/0002/master-plan.md).
 - [Relatório da etapa 04](docs/ADRS/0002/relatorios/etapa04-instalacao-limpa.md).
 
-VPS Ubuntu 24.04 confirmada pelo responsável. O backend/processo/proxy e a localização do banco ainda precisam ser inventariados antes do deploy. Estar na Hostinger não significa que frontend, banco e Java estejam no mesmo serviço.
+Produção atual: Hostinger VPS com Nginx no host, frontend estático em /var/www/podiss, backend Spring Boot em Docker publicado somente em 127.0.0.1:18080, MariaDB em Docker sem porta pública e Flyway executado separadamente. O procedimento completo de reconstrução, operação, atualização, backup e troubleshooting está no [runbook de produção da Hostinger VPS](docs/deployment/hostinger/vps/README.md).
 
 ## Contributing
 
